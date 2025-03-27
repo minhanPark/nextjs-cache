@@ -69,3 +69,79 @@ export default async function Home() {
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand # / 페이지가 f로 바뀐 것을 확인할 수 있다.
 ```
+
+### 추가적으로 변겨할 수 있는 방법
+
+request 객체에 직접적으로 접근을 하면 dynamic 라우트로 변경이 된다.
+
+```tsx
+import { cookies, headers } from 'next/headers';
+
+export default async function Home() {
+  await headers();
+  await cookies();
+```
+
+request에 접근하는 함수인 headers나 cookies를 사용하면 빌드시에 동적 라우터로 변경된 것을 확인할 수 있다.
+
+명시적으로는 dynamic설정을 추가할 수 있다.
+
+```tsx
+export const dynamic = "force-dynamic";
+```
+
+위처럼 dynamic 변수를 추가하면 빌드시에 동적 라우터로 변경된 것을 확인할 수 있다.
+
+## 정적 렌더링
+
+기본적으로는 정적 렌더링을 하면 위에서 봤듯이 시간이 변하진 않는다. 부분적으로 재검증을 통해서 특정 시간마다 아니면 강제적으로 값이 변하도록 할 수 있다.
+
+### 자동 재검증(Automatic Revalidation)
+
+5초마다 업데이트 하게 하려면 revalidate를 추가하면 된다.
+
+```tsx
+export const revalidate = 5; // 5초마다 업데이트 됨
+```
+
+정적 컨텐츠에 revalidate를 설정해주면 설정된 시간이 지난 후에 다시 데이터를 받아온다.
+
+### 수동으로 재검증(Manually Revalidation)
+
+```tsx
+export default async function Home() {
+  async function onRevalidateHome() {
+    "use server";
+    revalidatePath("/");
+  }
+
+  console.log(`Rendering  ${new Date().toLocaleTimeString()}`);
+  return (
+    <main>
+      <div className="">{new Date().toLocaleTimeString()}</div>
+      <RevalidateButton onRevalidateHome={onRevalidateHome} />
+    </main>
+  );
+}
+```
+
+onRevalidateHome 서버액션을 만들고 RevalidateButton에 전달했다.
+
+```tsx
+"use client";
+
+export default function RevalidateButton({
+  onRevalidateHome,
+}: {
+  onRevalidateHome: () => Promise<void>;
+}) {
+  return (
+    <button onClick={async () => await onRevalidateHome()} className="mt-4">
+      Revalidate Home
+    </button>
+  );
+}
+```
+
+RevalidateButton 컴포넌트는 위와 같이 생겼다.  
+버튼을 누르면 revalidatePath("/")가 작동이 되고 새로 렌더링이 되는것을 알 수 있다.
