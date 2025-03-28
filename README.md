@@ -145,3 +145,20 @@ export default function RevalidateButton({
 
 RevalidateButton 컴포넌트는 위와 같이 생겼다.  
 버튼을 누르면 revalidatePath("/")가 작동이 되고 새로 렌더링이 되는것을 알 수 있다.
+
+## API ROUTE 캐시
+
+이전 버전에서는 GET의 경우 자동으로 캐싱되었다. 하지만 15버전 부터는 GET이라도 자동으로 캐싱되지 않고 빌드 타임에 Dynamic 라우터로 변경된다.
+
+```tsx
+// src/app/time/route.ts
+
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  console.log(`GET /time ${new Date().toLocaleTimeString()}`);
+  return NextResponse.json({ time: new Date().toLocaleTimeString() });
+}
+```
+
+위와 같이 GET 라우터를 추가해보고 빌드해보면 dynamic 라우터로 되는 것을 확인할 수 있다.
