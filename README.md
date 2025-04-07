@@ -162,3 +162,25 @@ export async function GET() {
 ```
 
 위와 같이 GET 라우터를 추가해보고 빌드해보면 dynamic 라우터로 되는 것을 확인할 수 있다.
+
+## tag로 캐시 버스팅
+
+페이지를 동적으로 만들어도 함수 단위로 캐시를 걸 수도 있다.
+
+```ts
+"use server";
+
+import { unstable_cache } from "next/cache";
+
+async function getDBTimeReal() {
+  return {
+    time: new Date().toLocaleTimeString(),
+  };
+}
+
+export const getDBTime = unstable_cache(getDBTimeReal, ["db-time"], {
+  tags: ["db-time"],
+});
+```
+
+위와 같은 형태로 unstable_cache를 사용하고 tag를 추가하면 된다. revalidatePath(태그명) 형태로 캐시 버스팅 가능하다.
