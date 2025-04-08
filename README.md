@@ -184,3 +184,11 @@ export const getDBTime = unstable_cache(getDBTimeReal, ["db-time"], {
 ```
 
 위와 같은 형태로 unstable_cache를 사용하고 tag를 추가하면 된다. revalidatePath(태그명) 형태로 캐시 버스팅 가능하다.
+
+## 라우터 캐시
+
+nextjs에서 경로를 방문하면 페이지 콘텐츠가 캐시에 저장되고, 나중에 동일한 경로를 다시 방문하면 캐시된 버전이 즉시 로드되어 원활한 사용자 경험을 제공할 수 있도록 하는데 이걸 라우터 캐시라고 한다.
+
+서버액션에서 revalidatePath나 revalidateTag를 사용하면 요청 헤더에 x-nextjs-revalidate라는 헤더가 추가되고, 다음 탐색에서 재검증하도록 한다.
+
+기본적으로 라우터 캐시를 없애려면 router.refresh를 사용하면 된다.
